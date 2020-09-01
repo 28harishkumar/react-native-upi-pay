@@ -40,12 +40,6 @@ public class UpiPayModule extends ReactContextBaseJavaModule implements Activity
     }
 
     @ReactMethod
-    public boolean isAppInstalled(String packageName) {
-        Context currentContext = getCurrentActivity().getApplicationContext();
-        return appInstalledOrNot(packageName, currentContext);
-    }
-
-    @ReactMethod
     public void intializePayment(ReadableMap config,ReadableMap paymentApp, Callback successHandler, Callback failureHandler) {
         this.successHandler = successHandler;
         this.failureHandler = failureHandler;
@@ -53,7 +47,7 @@ public class UpiPayModule extends ReactContextBaseJavaModule implements Activity
         String PACKAGE_NAME = paymentApp.hasKey("PACKAGE_NAME") ?
         paymentApp.getString("PACKAGE_NAME") : "com.google.android.apps.nbu.paisa.user";
         
-        boolean isAppInstalled = this.isAppInstalled(PACKAGE_NAME);
+        boolean isAppInstalled = appInstalledOrNot(PACKAGE_NAME);
 
         if(isAppInstalled) {
             Intent intent = new Intent(Intent.ACTION_VIEW);
@@ -74,7 +68,13 @@ public class UpiPayModule extends ReactContextBaseJavaModule implements Activity
         
     }
 
-    private boolean appInstalledOrNot(String uri,Context context) {
+    @ReactMethod
+    private void isAppInstalled(String packageName, Callback callback) {
+      callback.invoke(appInstalledOrNot(packageName));
+    }
+
+    private boolean appInstalledOrNot(String uri) {
+        Context context = getCurrentActivity().getApplicationContext();
         PackageManager pm = context.getPackageManager();
         try {
             pm.getPackageInfo(uri, PackageManager.GET_ACTIVITIES);
