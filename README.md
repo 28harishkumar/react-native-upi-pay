@@ -4,7 +4,9 @@ react-native-upi is a plugin to integrate the UPI payment interface made by NPCI
 
 ## Getting started
 
-`$ npm install react-native-upi-pay --save`
+Add in package.json
+
+`"react-native-upi-pay": "https://github.com/28harishkumar/react-native-upi-pay"`
 
 ### Mostly automatic installation
 
