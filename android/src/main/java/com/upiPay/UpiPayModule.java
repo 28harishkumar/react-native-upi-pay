@@ -40,27 +40,26 @@ public class UpiPayModule extends ReactContextBaseJavaModule implements Activity
     }
 
     @ReactMethod
+    public boolean isAppInstalled(String packageName) {
+        Context currentContext = getCurrentActivity().getApplicationContext();
+        return appInstalledOrNot(packageName, currentContext);
+    }
+
+    @ReactMethod
     public void intializePayment(ReadableMap config,ReadableMap paymentApp, Callback successHandler, Callback failureHandler) {
         this.successHandler = successHandler;
         this.failureHandler = failureHandler;
         
-        
-        //int GOOGLE_PAY_REQUEST_CODE;
-
-        //String GOOGLE_PAY_PACKAGE_NAME = "com.google.android.apps.nbu.paisa.user";
-        //GOOGLE_PAY_REQUEST_CODE = 123;
-        
         String PACKAGE_NAME = paymentApp.hasKey("PACKAGE_NAME") ?
         paymentApp.getString("PACKAGE_NAME") : "com.google.android.apps.nbu.paisa.user";
-        Context currentContext = getCurrentActivity().getApplicationContext();
-        boolean isAppInstalled = appInstalledOrNot(PACKAGE_NAME,currentContext);
+        
+        boolean isAppInstalled = this.isAppInstalled(PACKAGE_NAME);
 
         if(isAppInstalled) {
             Intent intent = new Intent(Intent.ACTION_VIEW);
             intent.setData(Uri.parse(config.getString("upiString")));
             intent.setPackage(PACKAGE_NAME);
             getCurrentActivity().startActivityForResult(intent, 123);
-             
         }else{
             final JSONObject responseData = new JSONObject();
                 try {
