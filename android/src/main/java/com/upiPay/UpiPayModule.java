@@ -93,6 +93,11 @@ public class UpiPayModule extends ReactContextBaseJavaModule implements Activity
 
     @Override
     public void onActivityResult(Activity activity, int requestCode, int resultCode, Intent data) {
+        if(this.successHandler == null || this.failureHandler == null) {
+          // onActivityResult will also listen unwanted events
+          return;
+        }
+
         final JSONObject responseData = new JSONObject();
         try {
             if (data == null) {
@@ -104,13 +109,17 @@ public class UpiPayModule extends ReactContextBaseJavaModule implements Activity
 
             if (requestCode == REQUEST_CODE) {
                 Bundle bundle = data.getExtras();
-                if (data.getStringExtra("Status").equals("SUCCESS") || data.getStringExtra("Status").equals("Success") ) {
-                    responseData.put("status", data.getStringExtra("Status"));
+
+                // Status is missing in case of BHIM UPI
+                boolean hasStatus = data.hasExtra("Status");
+                String status = data.getStringExtra("Status");
+
+                if (hasStatus && (status.equals("SUCCESS") || status.equals("Success") )) {
+                    responseData.put("status", status);
                     responseData.put("message", bundle.getString("response"));
                     this.successHandler.invoke(gson.toJson(responseData));
-
                 } else {
-                    responseData.put("status", data.getStringExtra("Status"));
+                    responseData.put("status", status);
                     responseData.put("message", bundle.getString("response"));
                     this.failureHandler.invoke(gson.toJson(responseData));      
                 }
