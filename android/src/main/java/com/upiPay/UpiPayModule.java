@@ -24,6 +24,7 @@ import java.util.List;
 
 public class UpiPayModule extends ReactContextBaseJavaModule implements ActivityEventListener {
     private static final int REQUEST_CODE = 123;
+    private static boolean isIntialized = false;
     private final Gson gson = new Gson();
     private Callback successHandler;
     private Callback failureHandler;
@@ -41,6 +42,7 @@ public class UpiPayModule extends ReactContextBaseJavaModule implements Activity
 
     @ReactMethod
     public void intializePayment(ReadableMap config,ReadableMap paymentApp, Callback successHandler, Callback failureHandler) {
+        UpiPayModule.isIntialized = true;
         this.successHandler = successHandler;
         this.failureHandler = failureHandler;
         
@@ -97,6 +99,13 @@ public class UpiPayModule extends ReactContextBaseJavaModule implements Activity
           // onActivityResult will also listen unwanted events
           return;
         }
+
+        // working around filtering unwanted requests
+        if(!UpiPayModule.isIntialized) {
+          return;
+        }
+
+        UpiPayModule.isIntialized = false;
 
         final JSONObject responseData = new JSONObject();
         try {
